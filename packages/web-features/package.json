@@ -14,7 +14,9 @@
     "let-me-browse": "./cli.js",
     "lmb": "./cli.js",
     "fix-my-browse": "./fmb.js",
-    "fmb": "./fmb.js"
+    "fmb": "./fmb.js",
+    "set-my-browse": "./smb.js",
+    "smb": "./smb.js"
   },
   "exports": {
     ".": "./index.js",
@@ -28,6 +30,7 @@
     "types.quicktype.d.ts",
     "index.js",
     "fmb.js",
+    "smb.js",
     "cli.js",
     "data.json",
     "data.schema.json"

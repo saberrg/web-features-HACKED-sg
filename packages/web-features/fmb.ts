@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-import { browsers, features } from "./index";
+import { browsers, features } from "./index.js";
 
 type BrowserId = string;
 
