@@ -26,15 +26,15 @@ function defaultTargets() {
   const ids = Object.keys(browsers);
   const out = [];
   for (const id of ids) {
-    const rel = (browsers as any)[id]?.releases as { version: string }[] | undefined;
-    const latest = rel?.at(-1)?.version;
+    const rel = (browsers && browsers[id] && browsers[id].releases) || [];
+    const latest = rel.length ? rel[rel.length - 1].version : undefined;
     if (latest) out.push({ browser: id, version: latest });
   }
   return out;
 }
 
 function compareVersions(a, b) {
-  const sanitize = (v: string) => v.replace(/[^0-9.]/g, "");
+  const sanitize = (v) => v.replace(/[^0-9.]/g, "");
   const as = sanitize(a).split(".").map((n) => parseInt(n, 10));
   const bs = sanitize(b).split(".").map((n) => parseInt(n, 10));
   const len = Math.max(as.length, bs.length);
@@ -50,8 +50,8 @@ function compareVersions(a, b) {
 function* walk(dir) {
   const stack = [dir];
   while (stack.length) {
-    const current = stack.pop() as string;
-    let entries: fs.Dirent[] = [];
+    const current = stack.pop();
+    let entries = [];
     try {
       entries = fs.readdirSync(current, { withFileTypes: true });
     } catch { continue; }
@@ -89,7 +89,7 @@ function detectFeatures(srcDir) {
     let text = "";
     try { text = fs.readFileSync(file, "utf8"); } catch { continue; }
     for (const d of DETECTORS) {
-      if (!(d.fileTypes as any).includes(ft)) continue;
+      if (!(d.fileTypes || []).includes(ft)) continue;
       if (d.patterns.some((re) => re.test(text))) found.add(d.id);
     }
   }
@@ -101,7 +101,7 @@ function checkTargets(used, targets) {
   for (const t of targets) {
     const blockers = [];
     for (const fid of used) {
-      const f = (features as any)[fid];
+      const f = features && features[fid];
       if (!f || f.kind !== "feature") continue;
       const required = f.status?.support?.[t.browser];
       if (!required) continue;
@@ -115,7 +115,7 @@ function checkTargets(used, targets) {
 }
 
 function closestSuggestion(fid) {
-  const f = (features as any)[fid];
+  const f = features && features[fid];
   if (f?.discouraged?.alternatives?.length) return `use alternative(s): ${f.discouraged.alternatives.join(", ")}`;
   if (Array.isArray(f?.caniuse) && f.caniuse.length) return `see caniuse: ${f.caniuse.join(", ")}`;
   return undefined;
@@ -123,7 +123,7 @@ function closestSuggestion(fid) {
 
 function formatOutput(problems) {
   if (problems.length === 0) return "\nAll targets satisfied by detected features.\n\n";
-  const lines: string[] = [];
+  const lines = [];
   lines.push("");
   lines.push("Fix My Browse (targets check)\n");
   for (const p of problems) {
@@ -137,7 +137,7 @@ function formatOutput(problems) {
   return lines.join("\n");
 }
 
-function main(): void {
+function main() {
   const args = process.argv.slice(2);
   if (args.length === 0 || args.includes("-h") || args.includes("--help")) {
     printHelp();

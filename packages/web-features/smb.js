@@ -38,8 +38,8 @@ function parseSpecs(list) {
 function* walk(dir) {
   const stack = [dir];
   while (stack.length) {
-    const current = stack.pop() as string;
-    let entries: fs.Dirent[] = [];
+    const current = stack.pop();
+    let entries = [];
     try { entries = fs.readdirSync(current, { withFileTypes: true }); } catch { continue; }
     for (const e of entries) {
       if (e.name === "node_modules" || e.name.startsWith(".")) continue;
@@ -75,7 +75,7 @@ function detectFeatures(srcDir) {
     let text = "";
     try { text = fs.readFileSync(file, "utf8"); } catch { continue; }
     for (const d of DETECTORS) {
-      if (!(d.fileTypes as any).includes(ft)) continue;
+      if (!(d.fileTypes || []).includes(ft)) continue;
       if (d.patterns.some((re) => re.test(text))) found.add(d.id);
     }
   }
@@ -88,7 +88,7 @@ function matchesAllowedSpec(specs, patterns) {
 }
 
 function baselineTier(fid) {
-  const f = (features as any)[fid];
+  const f = features && features[fid];
   const b = f?.status?.baseline;
   if (b === "high") return "widely";
   if (b === "low") return "newly";
@@ -96,22 +96,22 @@ function baselineTier(fid) {
 }
 
 function compliantAlternatives(fid, allowPatterns, prefer) {
-  const f = (features as any)[fid];
+  const f = features && features[fid];
   const alts = [];
   // 1) discouraged alternatives if present
   for (const alt of f?.discouraged?.alternatives ?? []) {
-    const g = (features as any)[alt];
+    const g = features && features[alt];
     if (!g || g.kind !== "feature") continue;
     if (matchesAllowedSpec(g.spec, allowPatterns)) alts.push(alt);
   }
   // 2) nearby by group
   if (alts.length === 0 && Array.isArray(f?.group)) {
     const groups = new Set(f.group);
-    for (const [gid, gf] of Object.entries(features as any)) {
-      if ((gf as any).kind !== "feature") continue;
-      const groupList = (gf as any).group ?? [];
-      if (!groupList.some((g: string) => groups.has(g))) continue;
-      if (matchesAllowedSpec((gf as any).spec, allowPatterns)) alts.push(gid);
+    for (const [gid, gf] of Object.entries(features || {})) {
+      if (gf && gf.kind !== "feature") continue;
+      const groupList = (gf && gf.group) || [];
+      if (!groupList.some((g) => groups.has(g))) continue;
+      if (matchesAllowedSpec(gf && gf.spec, allowPatterns)) alts.push(gid);
     }
   }
   // order by prefer baseline
@@ -122,7 +122,7 @@ function compliantAlternatives(fid, allowPatterns, prefer) {
 
 function format(fid, explain) {
   if (!explain) return fid;
-  const f = (features as any)[fid];
+  const f = features && features[fid];
   const spec = Array.isArray(f?.spec) ? f.spec[0] : undefined;
   const tier = baselineTier(fid);
   return spec ? `${fid} [${tier}] — ${spec}` : `${fid} [${tier}]`;
@@ -158,14 +158,14 @@ function main() {
   const compliant = [];
   const noncompliant = [];
   for (const fid of used) {
-    const f = (features as any)[fid];
+    const f = features && features[fid];
     if (!f || f.kind !== "feature") continue;
     const ok = matchesAllowedSpec(f.spec, patterns);
     if ((modeArg === "allow" && ok) || (modeArg === "deny" && !ok)) compliant.push(fid);
     else noncompliant.push(fid);
   }
 
-  const lines: string[] = [];
+  const lines = [];
   lines.push("");
   lines.push("Set My Browse (spec policy)\n");
   lines.push(`mode: ${modeArg}`);
