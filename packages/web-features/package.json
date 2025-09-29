@@ -10,6 +10,10 @@
   },
   "type": "module",
   "main": "index.js",
+  "bin": {
+    "let-me-browse": "./cli.js",
+    "lmb": "./cli.js"
+  },
   "exports": {
     ".": "./index.js",
     "./data.json": "./data.json",
@@ -21,6 +25,7 @@
     "types.d.ts",
     "types.quicktype.d.ts",
     "index.js",
+    "cli.js",
     "data.json",
     "data.schema.json"
   ],
