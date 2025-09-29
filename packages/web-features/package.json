@@ -12,7 +12,9 @@
   "main": "index.js",
   "bin": {
     "let-me-browse": "./cli.js",
-    "lmb": "./cli.js"
+    "lmb": "./cli.js",
+    "fix-my-browse": "./fmb.js",
+    "fmb": "./fmb.js"
   },
   "exports": {
     ".": "./index.js",
@@ -25,6 +27,7 @@
     "types.d.ts",
     "types.quicktype.d.ts",
     "index.js",
+    "fmb.js",
     "cli.js",
     "data.json",
     "data.schema.json"
