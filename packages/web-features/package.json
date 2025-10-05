@@ -11,12 +11,12 @@
   "type": "module",
   "main": "index.js",
   "bin": {
-    "let-me-browse": "./let-me-browse/let-me-browse.js",
-    "lmb": "./let-me-browse/let-me-browse.js",
-    "fix-my-browse": "./fix-my-browse/fix-my-browse.js",
-    "fmb": "./fix-my-browse/fix-my-browse.js",
-    "set-my-browse": "./set-my-browse/set-my-browse.js",
-    "smb": "./set-my-browse/set-my-browse.js"
+    "let-me-browse": "./let-me-browse/let-me-browse.ts",
+    "lmb": "./let-me-browse/let-me-browse.ts",
+    "fix-my-browse": "./fix-my-browse/fix-my-browse.ts",
+    "fmb": "./fix-my-browse/fix-my-browse.ts",
+    "set-my-browse": "./set-my-browse/set-my-browse.ts",
+    "smb": "./set-my-browse/set-my-browse.ts"
   },
   "exports": {
     ".": "./index.js",
