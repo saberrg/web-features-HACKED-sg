@@ -5,6 +5,9 @@ group: container-queries
 caniuse:
   - css-container-queries
   - css-container-query-units
+detection_patterns:
+  css: ["@container\\b", "\\bcontainer-type\\b", "\\bcontainer-name\\b"]
+file_types: ["css", "scss", "less"]
 status:
   compute_from: css.at-rules.container
 compat_features:

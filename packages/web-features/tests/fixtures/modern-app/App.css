@@ -1,0 +1,36 @@
+/* Modern CSS with advanced features */
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-areas: 
+    "header header header"
+    "sidebar main aside"
+    "footer footer footer";
+}
+
+.item:has(.icon) {
+  background: blue;
+  color: white;
+}
+
+.item:has(.error) {
+  background: red;
+}
+
+.container {
+  container-type: inline-size;
+  container-name: main-container;
+}
+
+@container main-container (min-width: 600px) {
+  .responsive-item {
+    font-size: 1.2em;
+  }
+}
+
+.flex-layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}

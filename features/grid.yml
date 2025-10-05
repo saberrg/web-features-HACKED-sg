@@ -3,5 +3,8 @@ description: CSS grid is a two-dimensional layout system, which lays content out
 spec: https://drafts.csswg.org/css-grid-3/
 group: grid
 caniuse: css-grid
+detection_patterns:
+  css: ["display\\s*:\\s*grid\\b", "\\bgrid-template\\b", "\\bgrid-area\\b", "\\bgrid-column\\b", "\\bgrid-row\\b"]
+file_types: ["css", "scss", "less"]
 status:
   compute_from: css.properties.grid

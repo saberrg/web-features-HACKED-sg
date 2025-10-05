@@ -5,6 +5,10 @@ snapshot: ecmascript-2018
 spec:
   - https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-asynciteratorprototype
   - https://tc39.es/ecma262/multipage/ecmascript-language-statements-and-declarations.html#sec-for-in-and-for-of-statements
+detection_patterns:
+  js: ["for\\s+await\\s*\\(", "\\basync\\s+\\*\\s*", "\\byield\\s+", "\\bSymbol\\.asyncIterator\\b"]
+  ts: ["for\\s+await\\s*\\(", "\\basync\\s+\\*\\s*", "\\byield\\s+", "\\bSymbol\\.asyncIterator\\b"]
+file_types: ["js", "ts", "jsx", "tsx"]
 compat_features:
   - javascript.builtins.AsyncIterator
   - javascript.builtins.AsyncIterator.@@asyncIterator

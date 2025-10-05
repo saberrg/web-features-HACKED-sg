@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-10-05T05:10:38.163Z",
+  "results": [
+    {
+      "tool": "let-me-browse",
+      "success": true,
+      "detected": 1,
+      "total": 8,
+      "error": null
+    },
+    {
+      "tool": "fix-my-browse",
+      "success": false,
+      "detected": 0,
+      "total": 0,
+      "error": "Command failed: node fix-my-browse/fix-my-browse.js ./tests/fixtures/modern-app --targets=chrome>=100,firefox>=100\nError: provide --targets=list or --default.\n"
+    },
+    {
+      "tool": "set-my-browse",
+      "success": true,
+      "detected": 3,
+      "total": 3,
+      "error": null
+    }
+  ],
+  "summary": {
+    "toolsPassed": 2,
+    "totalTools": 3,
+    "featuresDetected": 4,
+    "featuresExpected": 11
+  }
+}

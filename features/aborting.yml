@@ -2,6 +2,10 @@ name: AbortController and AbortSignal
 description: The `AbortController` and `AbortSignal` APIs allow you to cancel an ongoing operation, such as a `fetch()` request.
 spec: https://dom.spec.whatwg.org/#aborting-ongoing-activities
 caniuse: abortcontroller
+detection_patterns:
+  js: ["\\bAbortController\\b", "\\bAbortSignal\\b", "\\bsignal\\b", "\\.abort\\(\\b"]
+  ts: ["\\bAbortController\\b", "\\bAbortSignal\\b", "\\bsignal\\b", "\\.abort\\(\\b"]
+file_types: ["js", "ts", "jsx", "tsx"]
 status:
   compute_from: api.AbortController
 compat_features:

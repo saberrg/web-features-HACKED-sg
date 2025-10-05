@@ -2,6 +2,10 @@ name: Fetch
 description: The `fetch()` method makes asynchronous HTTP requests.
 spec: https://fetch.spec.whatwg.org/
 caniuse: fetch
+detection_patterns:
+  js: ["\\bfetch\\s*\\(", "\\bResponse\\b", "\\bRequest\\b", "\\bHeaders\\b"]
+  ts: ["\\bfetch\\s*\\(", "\\bResponse\\b", "\\bRequest\\b", "\\bHeaders\\b"]
+file_types: ["js", "ts", "jsx", "tsx"]
 status:
   compute_from: api.fetch
 compat_features:

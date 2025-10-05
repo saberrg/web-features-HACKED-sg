@@ -1,0 +1,29 @@
+/* Legacy CSS with basic features */
+.box {
+  display: flex;
+  background: red;
+  color: white;
+  padding: 10px;
+}
+
+.button {
+  background: blue;
+  border: none;
+  padding: 8px 16px;
+  color: white;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sidebar {
+  float: left;
+  width: 200px;
+}
+
+.content {
+  margin-left: 220px;
+}

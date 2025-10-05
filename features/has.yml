@@ -3,3 +3,6 @@ description: The `:has()` CSS functional pseudo-class matches an element if any 
 spec: https://drafts.csswg.org/selectors-4/#relational
 group: selectors
 caniuse: css-has
+detection_patterns:
+  css: ["\\:has\\("]
+file_types: ["css", "scss", "less"]

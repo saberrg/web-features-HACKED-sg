@@ -11,12 +11,12 @@
   "type": "module",
   "main": "index.js",
   "bin": {
-    "let-me-browse": "./cli.js",
-    "lmb": "./cli.js",
-    "fix-my-browse": "./fmb.js",
-    "fmb": "./fmb.js",
-    "set-my-browse": "./smb.js",
-    "smb": "./smb.js"
+    "let-me-browse": "./let-me-browse/let-me-browse.js",
+    "lmb": "./let-me-browse/let-me-browse.js",
+    "fix-my-browse": "./fix-my-browse/fix-my-browse.js",
+    "fmb": "./fix-my-browse/fix-my-browse.js",
+    "set-my-browse": "./set-my-browse/set-my-browse.js",
+    "smb": "./set-my-browse/set-my-browse.js"
   },
   "exports": {
     ".": "./index.js",
@@ -29,14 +29,17 @@
     "types.d.ts",
     "types.quicktype.d.ts",
     "index.js",
-    "fmb.js",
-    "smb.js",
-    "cli.js",
+    "fix-my-browse/",
+    "set-my-browse/",
+    "let-me-browse/",
     "data.json",
     "data.schema.json"
   ],
   "scripts": {
-    "prepare": "tsc && rm types.js && rm types.quicktype.js"
+    "prepare": "tsc && del types.js && del types.quicktype.js"
+  },
+  "dependencies": {
+    "compute-baseline": "file:../compute-baseline"
   },
   "devDependencies": {
     "@types/node": "^20.19.17",

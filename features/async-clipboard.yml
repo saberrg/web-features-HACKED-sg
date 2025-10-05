@@ -3,6 +3,10 @@ description: The `navigator.clipboard` API asynchronously reads and writes to th
 spec: https://w3c.github.io/clipboard-apis/#async-clipboard-api
 caniuse: async-clipboard
 group: clipboard
+detection_patterns:
+  js: ["\\bnavigator\\.clipboard\\b", "\\bClipboardItem\\b", "\\.writeText\\b", "\\.readText\\b"]
+  ts: ["\\bnavigator\\.clipboard\\b", "\\bClipboardItem\\b", "\\.writeText\\b", "\\.readText\\b"]
+file_types: ["js", "ts", "jsx", "tsx"]
 # This feature's support history and data has been rather tangled. See:
 # https://github.com/web-platform-dx/web-features/issues/1249
 status:
