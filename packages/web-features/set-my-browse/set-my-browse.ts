@@ -26,10 +26,10 @@ function parseSpecs(specsString?: string): string[] {
 
 function getBaselineIcon(baseline?: string): string {
   switch (baseline) {
-    case "high": return "🟢";
-    case "low": return "🟡";
-    case "false": return "🔴";
-    default: return "❓";
+    case "high": return "[HIGH]";
+    case "low": return "[LOW]";
+    case "false": return "[LIMITED]";
+    default: return "[UNKNOWN]";
   }
 }
 
@@ -56,7 +56,7 @@ function formatFeature(featureId: string, specs: string[], mode: Mode, prefer?: 
   // Add alternatives
   const alternatives = (feature as any).discouraged?.alternatives || [];
   if (alternatives.length > 0) {
-    lines.push(`   💡 Alternatives: ${alternatives.join(", ")}`);
+    lines.push(`   Alternatives: ${alternatives.join(", ")}`);
   }
   
   return lines.join("\n");
@@ -123,17 +123,17 @@ function main(): void {
   
   // Output results
   const lines: string[] = [];
-  lines.push("\n🎯 Policy Compliance Report");
-  lines.push("✨ Powered by Baseline Detection API");
+  lines.push("\nPolicy Compliance Report");
+  lines.push("Powered by Baseline Detection API");
   lines.push("");
-  lines.push("📊 SUMMARY");
+  lines.push("SUMMARY");
   lines.push(`Total Features: ${used.size}`);
   lines.push(`Compliant: ${compliant.size}`);
   lines.push(`Non-compliant: ${nonCompliant.size}`);
   lines.push("");
   
   if (compliant.size > 0) {
-    lines.push("✅ COMPLIANT FEATURES");
+    lines.push("COMPLIANT FEATURES");
     for (const featureId of Array.from(compliant)) {
       const feature = features[featureId];
       const baseline = (feature as any)?.status?.baseline;
@@ -144,7 +144,7 @@ function main(): void {
   }
   
   if (nonCompliant.size > 0) {
-    lines.push("❌ NON-COMPLIANT FEATURES");
+    lines.push("NON-COMPLIANT FEATURES");
     lines.push("");
     for (const featureId of Array.from(nonCompliant)) {
       lines.push(formatFeature(featureId, specs, mode, prefer, explain));
@@ -152,15 +152,15 @@ function main(): void {
     }
   }
   
-  lines.push("💡 NOTES");
+  lines.push("NOTES");
   lines.push(`• Policy: ${mode} features from specified specs`);
-  lines.push(`• Baseline icons: 🟢 widely available, 🟡 newly available, 🔴 limited availability`);
+  lines.push(`• Baseline icons: [HIGH] widely available, [LOW] newly available, [LIMITED] limited availability`);
   lines.push(`• Use --explain for detailed information about each feature`);
   if (prefer) {
     lines.push(`• Preference: ${prefer === "widely" ? "prioritizing widely available alternatives" : "prioritizing newly available alternatives"}`);
   }
   lines.push("");
-  lines.push("🚀 This scan used the baseline detection API for accurate feature detection!");
+  lines.push("This scan used the baseline detection API for accurate feature detection!");
   
   process.stdout.write(lines.join("\n"));
 }

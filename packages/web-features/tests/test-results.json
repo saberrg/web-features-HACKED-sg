@@ -1,17 +1,17 @@
 {
-  "timestamp": "2025-10-06T03:26:43.994Z",
+  "timestamp": "2025-10-06T03:40:54.617Z",
   "results": [
     {
       "tool": "let-me-browse",
       "success": true,
-      "detected": 3,
-      "total": 8,
+      "detected": 4,
+      "total": 4,
       "error": null
     },
     {
       "tool": "fix-my-browse",
       "success": true,
-      "detected": 1,
+      "detected": 2,
       "total": 2,
       "error": null
     },
@@ -26,7 +26,7 @@
   "summary": {
     "toolsPassed": 3,
     "totalTools": 3,
-    "featuresDetected": 7,
-    "featuresExpected": 13
+    "featuresDetected": 9,
+    "featuresExpected": 9
   }
 }

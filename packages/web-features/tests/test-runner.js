@@ -12,8 +12,8 @@ function runTest(tool, args, expectedFeatures) {
     const command = `node ${tool}/${tool}.js ${args}`;
     const output = execSync(command, { encoding: 'utf8', shell: true });
     
-    console.log('✅ Tool ran successfully');
-    console.log('📄 Output preview:');
+    console.log('[PASS] Tool ran successfully');
+    console.log('Output preview:');
     console.log('─'.repeat(50));
     console.log(output.substring(0, 500) + (output.length > 500 ? '...' : ''));
     console.log('─'.repeat(50));
@@ -22,17 +22,17 @@ function runTest(tool, args, expectedFeatures) {
     let detectedCount = 0;
     for (const feature of expectedFeatures) {
       if (output.includes(feature)) {
-        console.log(`✅ Detected: ${feature}`);
+        console.log(`[DETECTED] ${feature}`);
         detectedCount++;
       } else {
-        console.log(`❌ Missing: ${feature}`);
+        console.log(`[MISSING] ${feature}`);
       }
     }
     
-    console.log(`📊 Detection rate: ${detectedCount}/${expectedFeatures.length} features`);
+    console.log(`Detection rate: ${detectedCount}/${expectedFeatures.length} features`);
     return { success: true, output, detectedCount, total: expectedFeatures.length };
   } catch (error) {
-    console.log(`❌ Tool failed: ${error.message}`);
+    console.log(`[FAILED] Tool failed: ${error.message}`);
     return { success: false, error: error.message };
   }
 }
@@ -41,8 +41,8 @@ function checkEnhancementFeatures(output, toolName) {
   const enhancements = [];
   
   // Check for enhanced output features
-  if (output.includes('🎯') || output.includes('📊') || output.includes('🌐')) {
-    enhancements.push('Rich formatting with emojis');
+  if (output.includes('Baseline Coverage Audit') || output.includes('Policy Compliance Report')) {
+    enhancements.push('Professional formatting');
   }
   
   if (output.includes('Baseline Status') || output.includes('baseline')) {
@@ -53,12 +53,12 @@ function checkEnhancementFeatures(output, toolName) {
     enhancements.push('CanIUse links');
   }
   
-  if (toolName === 'let-me-browse' && output.includes('Enhanced Baseline Coverage Audit')) {
-    enhancements.push('Enhanced audit report');
+  if (toolName === 'let-me-browse' && output.includes('Baseline Coverage Audit')) {
+    enhancements.push('Audit report');
   }
   
-  if (toolName === 'fix-my-browse' && output.includes('Fix My Browse (targets check)')) {
-    enhancements.push('Enhanced target checking');
+  if (toolName === 'fix-my-browse' && output.includes('Browser Target Compatibility Issues')) {
+    enhancements.push('Target checking');
   }
   
   if (toolName === 'set-my-browse' && output.includes('Policy Compliance Report')) {
@@ -69,43 +69,39 @@ function checkEnhancementFeatures(output, toolName) {
 }
 
 // Main test execution
-console.log('🚀 Testing Enhanced Baseline Tools');
+console.log('Testing Baseline Tools');
 console.log('=' .repeat(60));
 
 // Test 1: let-me-browse with modern app
-console.log('\n📋 Test 1: let-me-browse (Enhanced Detection & Reporting)');
+console.log('\nTest 1: let-me-browse (Detection & Reporting)');
 const lmbResult = runTest('let-me-browse', './tests/fixtures/modern-app', [
   'CSS Grid',
-  'AbortController', 
-  'navigator.clipboard',
-  'fetch',
-  'async',
-  'await',
-  'import',
-  'export'
+  'AbortController/AbortSignal',
+  'Async Clipboard API',
+  'CSS :has() selector'
 ]);
 
 if (lmbResult.success) {
   const lmbEnhancements = checkEnhancementFeatures(lmbResult.output, 'let-me-browse');
-  console.log('🎨 Enhancement features found:');
-  lmbEnhancements.forEach(enhancement => console.log(`  ✅ ${enhancement}`));
+  console.log('Features found:');
+  lmbEnhancements.forEach(enhancement => console.log(`  [FOUND] ${enhancement}`));
 }
 
 // Test 2: fix-my-browse with browser targets
-console.log('\n📋 Test 2: fix-my-browse (Enhanced Target Validation)');
+console.log('\nTest 2: fix-my-browse (Target Validation)');
 const fmbResult = runTest('fix-my-browse', './tests/fixtures/modern-app --targets="chrome>=100,firefox>=100"', [
-  'blockers:',
-  'requires'
+  'blockers',
+  'Requires:'
 ]);
 
 if (fmbResult.success) {
   const fmbEnhancements = checkEnhancementFeatures(fmbResult.output, 'fix-my-browse');
-  console.log('🎨 Enhancement features found:');
-  fmbEnhancements.forEach(enhancement => console.log(`  ✅ ${enhancement}`));
+  console.log('Features found:');
+  fmbEnhancements.forEach(enhancement => console.log(`  [FOUND] ${enhancement}`));
 }
 
 // Test 3: set-my-browse with policy
-console.log('\n📋 Test 3: set-my-browse (Enhanced Policy Compliance)');
+console.log('\nTest 3: set-my-browse (Policy Compliance)');
 const smbResult = runTest('set-my-browse', './tests/fixtures/modern-app --specs=csswg --mode=allow', [
   'Policy Compliance Report',
   'Compliant:',
@@ -114,13 +110,13 @@ const smbResult = runTest('set-my-browse', './tests/fixtures/modern-app --specs=
 
 if (smbResult.success) {
   const smbEnhancements = checkEnhancementFeatures(smbResult.output, 'set-my-browse');
-  console.log('🎨 Enhancement features found:');
-  smbEnhancements.forEach(enhancement => console.log(`  ✅ ${enhancement}`));
+  console.log('Features found:');
+  smbEnhancements.forEach(enhancement => console.log(`  [FOUND] ${enhancement}`));
 }
 
 // Summary
 console.log('\n' + '='.repeat(60));
-console.log('📊 TEST SUMMARY');
+console.log('TEST SUMMARY');
 console.log('='.repeat(60));
 
 const results = [
@@ -135,18 +131,18 @@ let totalExpected = 0;
 
 results.forEach(({ tool, result }) => {
   if (result.success) {
-    console.log(`✅ ${tool}: PASSED (${result.detectedCount}/${result.total} features)`);
+    console.log(`[PASS] ${tool}: PASSED (${result.detectedCount}/${result.total} features)`);
     successCount++;
     totalDetected += result.detectedCount;
     totalExpected += result.total;
   } else {
-    console.log(`❌ ${tool}: FAILED (${result.error})`);
+    console.log(`[FAIL] ${tool}: FAILED (${result.error})`);
   }
 });
 
-console.log(`\n🎯 Overall: ${successCount}/3 tools passed`);
-console.log(`📈 Detection: ${totalDetected}/${totalExpected} features detected`);
-console.log(`\n${successCount === 3 ? '🎉 All tests passed! Your enhancements are working!' : '⚠️  Some tests failed. Check the output above.'}`);
+console.log(`\nOverall: ${successCount}/3 tools passed`);
+console.log(`Detection: ${totalDetected}/${totalExpected} features detected`);
+console.log(`\n${successCount === 3 ? 'All tests passed! Tools are working correctly!' : 'Some tests failed. Check the output above.'}`);
 
 // Save detailed results
 const report = {
@@ -167,4 +163,4 @@ const report = {
 };
 
 fs.writeFileSync('./tests/test-results.json', JSON.stringify(report, null, 2));
-console.log('\n📄 Detailed results saved to tests/test-results.json');
+console.log('\nDetailed results saved to tests/test-results.json');

@@ -122,10 +122,10 @@ function checkTargets(usedFeatures: Set<string>, targets: Target[]) {
 
 function getBaselineIcon(baseline?: string): string {
   switch (baseline) {
-    case "high": return "🟢";
-    case "low": return "🟡";
-    case "false": return "🔴";
-    default: return "❓";
+    case "high": return "[HIGH]";
+    case "low": return "[LOW]";
+    case "false": return "[LIMITED]";
+    default: return "[UNKNOWN]";
   }
 }
 

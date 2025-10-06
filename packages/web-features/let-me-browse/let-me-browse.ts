@@ -77,22 +77,22 @@ function computeRequirements(featureIds: string[]) {
 
 function getBaselineIcon(baseline: string): string {
   switch (baseline) {
-    case "high": return "🟢";
-    case "low": return "🟡";
-    case "false": return "🔴";
-    default: return "❓";
+    case "high": return "[HIGH]";
+    case "low": return "[LOW]";
+    case "false": return "[LIMITED]";
+    default: return "[UNKNOWN]";
   }
 }
 
 function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detectedCount: number, detectionResult: any): string {
   const lines: string[] = [];
   lines.push("");
-  lines.push("🎯 Baseline Coverage Audit");
-  lines.push("✨ Powered by Baseline Detection API");
+  lines.push("Baseline Coverage Audit");
+  lines.push("Powered by Baseline Detection API");
   lines.push("");
   
   // Summary section
-  lines.push("📊 SUMMARY");
+  lines.push("SUMMARY");
   lines.push(`Detected Features: ${detectedCount}`);
   
   const highBaselineCount = Object.values(perBrowser).filter(b => b.baseline === "high").length;
@@ -100,7 +100,7 @@ function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detect
   lines.push("");
   
   // Browser requirements
-  lines.push("🌐 BROWSER REQUIREMENTS");
+  lines.push("BROWSER REQUIREMENTS");
   lines.push("Browser  |  Min Version  |  Baseline Status");
   lines.push("-------------------------------------------");
   
@@ -113,7 +113,7 @@ function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detect
   lines.push("");
   
   // Detected features
-  lines.push("🔍 DETECTED FEATURES");
+  lines.push("DETECTED FEATURES");
   
   for (const featureId of Array.from(detectionResult.found) as string[]) {
     const feature = features[featureId];
@@ -130,7 +130,7 @@ function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detect
     }
   }
   
-  lines.push("🚀 This scan used the baseline detection API for accurate feature detection!");
+  lines.push("This scan used the baseline detection API for accurate feature detection!");
   
   return lines.join("\n");
 }
