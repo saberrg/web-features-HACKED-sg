@@ -11,8 +11,6 @@ export function feature(id, compat = defaultCompat) {
     return f;
 }
 export class Feature {
-    id; // dotted.path.to.feature
-    data; // underlying BCD object
     constructor(id, featureData) {
         if (!isFeatureData(featureData)) {
             throw new Error(`${id} is not valid feature`);

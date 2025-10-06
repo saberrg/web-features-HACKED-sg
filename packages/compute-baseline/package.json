@@ -19,7 +19,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "prepare": "cp ../../LICENSE.txt . && tsc",
+    "prepare": "node -e \"require('fs').copyFileSync('../../LICENSE.txt', './LICENSE.txt')\"",
     "test:coverage": "c8 npm run test",
     "test:types": "tsc --noEmit",
     "test": "mocha -r tsx 'src/**/*.test.ts'"

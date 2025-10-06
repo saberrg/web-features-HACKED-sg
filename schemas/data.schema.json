@@ -155,6 +155,19 @@
         "discouraged": {
           "description": "Whether developers are formally discouraged from using this feature",
           "$ref": "#/definitions/Discouraged"
+        },
+        "detection_patterns": {
+          "description": "Regex patterns for detecting this feature in code",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "file_types": {
+          "description": "File types this feature can be detected in",
+          "type": "array",
+          "items": { "type": "string" }
         }
       },
       "required": [

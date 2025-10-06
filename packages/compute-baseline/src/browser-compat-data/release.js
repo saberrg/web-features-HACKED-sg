@@ -1,9 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
 export class Release {
-    browser;
-    version;
-    data;
-    releaseIndex;
     constructor(browser, version, data, index) {
         this.browser = browser;
         this.version = version;

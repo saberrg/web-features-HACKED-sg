@@ -1,19 +1,19 @@
 {
-  "timestamp": "2025-10-05T05:10:38.163Z",
+  "timestamp": "2025-10-06T03:26:43.994Z",
   "results": [
     {
       "tool": "let-me-browse",
       "success": true,
-      "detected": 1,
+      "detected": 3,
       "total": 8,
       "error": null
     },
     {
       "tool": "fix-my-browse",
-      "success": false,
-      "detected": 0,
-      "total": 0,
-      "error": "Command failed: node fix-my-browse/fix-my-browse.js ./tests/fixtures/modern-app --targets=chrome>=100,firefox>=100\nError: provide --targets=list or --default.\n"
+      "success": true,
+      "detected": 1,
+      "total": 2,
+      "error": null
     },
     {
       "tool": "set-my-browse",
@@ -24,9 +24,9 @@
     }
   ],
   "summary": {
-    "toolsPassed": 2,
+    "toolsPassed": 3,
     "totalTools": 3,
-    "featuresDetected": 4,
-    "featuresExpected": 11
+    "featuresDetected": 7,
+    "featuresExpected": 13
   }
 }

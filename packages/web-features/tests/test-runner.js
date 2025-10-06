@@ -6,10 +6,11 @@ import path from 'path';
 function runTest(tool, args, expectedFeatures) {
   console.log(`\n🧪 Testing ${tool}...`);
   console.log(`Command: node ${tool}/${tool}.js ${args}`);
+  console.log(`Working directory: ${process.cwd()}`);
   
   try {
     const command = `node ${tool}/${tool}.js ${args}`;
-    const output = execSync(command, { encoding: 'utf8' });
+    const output = execSync(command, { encoding: 'utf8', shell: true });
     
     console.log('✅ Tool ran successfully');
     console.log('📄 Output preview:');
@@ -92,7 +93,7 @@ if (lmbResult.success) {
 
 // Test 2: fix-my-browse with browser targets
 console.log('\n📋 Test 2: fix-my-browse (Enhanced Target Validation)');
-const fmbResult = runTest('fix-my-browse', './tests/fixtures/modern-app --targets=chrome>=100,firefox>=100', [
+const fmbResult = runTest('fix-my-browse', './tests/fixtures/modern-app --targets="chrome>=100,firefox>=100"', [
   'blockers:',
   'requires'
 ]);

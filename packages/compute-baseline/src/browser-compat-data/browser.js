@@ -12,9 +12,6 @@ export function browser(id, compat = defaultCompat) {
     return b;
 }
 export class Browser {
-    id;
-    data;
-    releases;
     constructor(id, data) {
         this.id = id;
         this.data = data;

@@ -2,9 +2,6 @@ import bcd from "@mdn/browser-compat-data" with { type: "json" };
 import { browser, feature, query, walk } from "./index.js";
 import { isIndexable, isMetaBlock } from "./typeUtils.js";
 export class Compat {
-    data;
-    browsers;
-    features;
     constructor(data = bcd) {
         this.data = data;
         this.browsers = new Map();

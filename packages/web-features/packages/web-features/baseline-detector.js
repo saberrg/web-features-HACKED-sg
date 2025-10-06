@@ -38,7 +38,7 @@ function parseYamlSimple(content) {
             else if (result.detection_patterns && keyTrimmed.match(/^(css|js|ts|jsx|tsx)$/)) {
                 // Parse detection pattern arrays for specific file types
                 if (valueTrimmed.startsWith('[') && valueTrimmed.endsWith(']')) {
-                    const patterns = valueTrimmed.slice(1, -1).split(',').map(p => p.trim().replace(/^["']|["']$/g, '').replace(/\\\\/g, '\\'));
+                    const patterns = valueTrimmed.slice(1, -1).split(',').map(p => p.trim().replace(/^["']|["']$/g, ''));
                     result.detection_patterns[keyTrimmed] = patterns;
                 }
             }

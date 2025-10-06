@@ -8,6 +8,49 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { readFileSync } from "node:fs";
+// Simple YAML parser for basic key-value extraction
+function parseYamlSimple(content: string): any {
+  const result: any = {};
+  const lines = content.split('\n');
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('#') || !trimmed) continue;
+    
+    if (trimmed.includes(':')) {
+      const [key, ...valueParts] = trimmed.split(':');
+      const keyTrimmed = key.trim();
+      const valueTrimmed = valueParts.join(':').trim();
+      
+      if (keyTrimmed === 'detection_patterns') {
+        result.detection_patterns = {};
+      } else if (keyTrimmed === 'file_types') {
+        result.file_types = [];
+      } else if (keyTrimmed === 'name') {
+        result.name = valueTrimmed;
+      } else if (keyTrimmed === 'description') {
+        result.description = valueTrimmed;
+      } else if (keyTrimmed === 'status') {
+        result.status = {};
+      } else if (result.detection_patterns && keyTrimmed.match(/^(css|js|ts|jsx|tsx)$/)) {
+        // Parse detection pattern arrays for specific file types
+        if (valueTrimmed.startsWith('[') && valueTrimmed.endsWith(']')) {
+          const patterns = valueTrimmed.slice(1, -1).split(',').map(p => p.trim().replace(/^["']|["']$/g, ''));
+          result.detection_patterns[keyTrimmed] = patterns;
+        }
+      } else if (result.file_types && valueTrimmed.startsWith('[') && valueTrimmed.endsWith(']')) {
+        const types = valueTrimmed.slice(1, -1).split(',').map(t => t.trim().replace(/^["']|["']$/g, ''));
+        result.file_types = types;
+      } else if (result.status && keyTrimmed.startsWith('  ') && keyTrimmed.includes(':')) {
+        const statusKey = keyTrimmed.trim();
+        result.status[statusKey] = valueTrimmed;
+      }
+    }
+  }
+  
+  return result;
+}
 import { features } from "./index.js";
 import { FeatureData } from "../../types.js";
 
@@ -94,38 +137,85 @@ function* walkDirectory(dir: string): Generator<string> {
   }
 }
 
-// Build detection patterns from actual feature data
+// Build detection patterns from YAML source files directly
 function buildDetectionPatterns(): Record<string, CompiledPattern> {
   const patterns: Record<string, CompiledPattern> = {};
   
-  for (const [featureId, feature] of Object.entries(features)) {
-    if (!feature || feature.kind !== "feature") continue;
+  // Read YAML files directly from features directory
+  const featuresDir = path.resolve(process.cwd(), '../../features');
+  
+  try {
+    const featureFiles = fs.readdirSync(featuresDir).filter(file => file.endsWith('.yml'));
     
-    const detectionPatterns = (feature as FeatureWithDetection).detection_patterns;
-    if (!detectionPatterns) continue;
-    
-    const compiledPatterns: { [fileType in FileType]?: RegExp[] } = {};
-    
-    // Convert string patterns to regex for each file type
-    for (const [fileType, patternStrings] of Object.entries(detectionPatterns)) {
-      if (Array.isArray(patternStrings)) {
-        const validFileType = ['js', 'ts', 'jsx', 'tsx', 'css', 'scss', 'less'].includes(fileType);
-        if (validFileType) {
-          compiledPatterns[fileType as FileType] = patternStrings.map(pattern => 
-            new RegExp(pattern, 'g')
-          );
+    for (const file of featureFiles) {
+      const featureId = path.basename(file, '.yml');
+      const filePath = path.join(featuresDir, file);
+      
+      try {
+        const yamlContent = readFileSync(filePath, 'utf8');
+        const yamlData = parseYamlSimple(yamlContent);
+        
+        if (!yamlData.detection_patterns) continue;
+        
+        const compiledPatterns: { [fileType in FileType]?: RegExp[] } = {};
+        
+        // Convert string patterns to regex for each file type
+        for (const [fileType, patternStrings] of Object.entries(yamlData.detection_patterns)) {
+          if (Array.isArray(patternStrings)) {
+            const validFileType = ['js', 'ts', 'jsx', 'tsx', 'css', 'scss', 'less'].includes(fileType);
+            if (validFileType) {
+              compiledPatterns[fileType as FileType] = patternStrings.map((pattern: string) => 
+                new RegExp(pattern, 'g')
+              );
+            }
+          }
         }
+        
+        if (Object.keys(compiledPatterns).length > 0) {
+          patterns[featureId] = {
+            name: yamlData.name || featureId,
+            description: yamlData.description || "No description",
+            patterns: compiledPatterns,
+            fileTypes: yamlData.file_types || [],
+            baseline: String(yamlData.status?.baseline || 'unknown')
+          };
+        }
+      } catch (error) {
+        // Skip files we can't parse
+        continue;
       }
     }
-    
-    if (Object.keys(compiledPatterns).length > 0) {
-      patterns[featureId] = {
-        name: (feature as FeatureData).name || featureId,
-        description: (feature as FeatureData).description || "No description",
-        patterns: compiledPatterns,
-        fileTypes: (feature as FeatureWithDetection).file_types || [],
-        baseline: String((feature as FeatureData).status?.baseline || 'unknown')
-      };
+  } catch (error) {
+    // Fallback to built features data if YAML reading fails
+    console.warn('Could not read YAML files, falling back to built features data');
+    for (const [featureId, feature] of Object.entries(features)) {
+      if (!feature || feature.kind !== "feature") continue;
+      
+      const detectionPatterns = (feature as FeatureWithDetection).detection_patterns;
+      if (!detectionPatterns) continue;
+      
+      const compiledPatterns: { [fileType in FileType]?: RegExp[] } = {};
+      
+      for (const [fileType, patternStrings] of Object.entries(detectionPatterns)) {
+        if (Array.isArray(patternStrings)) {
+          const validFileType = ['js', 'ts', 'jsx', 'tsx', 'css', 'scss', 'less'].includes(fileType);
+          if (validFileType) {
+            compiledPatterns[fileType as FileType] = patternStrings.map(pattern => 
+              new RegExp(pattern, 'g')
+            );
+          }
+        }
+      }
+      
+      if (Object.keys(compiledPatterns).length > 0) {
+        patterns[featureId] = {
+          name: (feature as FeatureData).name || featureId,
+          description: (feature as FeatureData).description || "No description",
+          patterns: compiledPatterns,
+          fileTypes: (feature as FeatureWithDetection).file_types || [],
+          baseline: String((feature as FeatureData).status?.baseline || 'unknown')
+        };
+      }
     }
   }
   

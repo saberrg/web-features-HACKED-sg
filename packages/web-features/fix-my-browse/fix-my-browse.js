@@ -4,8 +4,7 @@ import * as path from "node:path";
 import * as process from "node:process";
 import { browsers, features } from "../index.js";
 import { detectFeatures as detectFeaturesBaseline } from "../baseline-detector.js";
-// Core browsers list
-const coreBrowserSet = ["chrome", "chrome_android", "edge", "firefox", "firefox_android", "safari", "safari_ios"];
+import { identifiers as coreBrowserSet } from "../../compute-baseline/src/baseline/core-browser-set.js";
 //CLI tool that answers the question of will my code break on these browsers?
 // scans your code for web features and checks if they are supported by the browser targets.
 //use this by doing fix-my-browse <srcDir> --targets=<list>|--default

@@ -356,6 +356,14 @@ function toDist(sourcePath: string): YAML.Document {
     insertCompatFeatures(dist, sortedGroups);
   }
 
+  // Copy detection patterns and file types from source if they exist
+  if (source.detection_patterns) {
+    dist.set("detection_patterns", source.detection_patterns);
+  }
+  if (source.file_types) {
+    dist.set("file_types", source.file_types);
+  }
+
   return dist;
 }
 

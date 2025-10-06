@@ -6,9 +6,7 @@ import * as process from "node:process";
 import { features } from "../index.js";
 // Import baseline detection API
 import { detectFeatures as detectFeaturesBaseline } from "../baseline-detector.js";
-// Import compute-baseline utilities
-// Core browsers list
-const coreBrowserSet = ["chrome", "chrome_android", "edge", "firefox", "firefox_android", "safari", "safari_ios"];
+import { identifiers as coreBrowserSet } from "../../compute-baseline/src/baseline/core-browser-set.js";
 function printHelp() {
     const help = `\nUsage: let-me-browse <srcDir>\n\nScans your source code to estimate minimum required browser versions based on detected web features.\n\nExamples:\n  let-me-browse ./src\n`;
     process.stdout.write(help);
@@ -34,8 +32,8 @@ function computeRequirements(featureIds) {
                 if (!perBrowser[browserId])
                     continue;
                 const currentVersion = perBrowser[browserId].minVersion;
-                if (version > currentVersion) {
-                    perBrowser[browserId].minVersion = version;
+                if (String(version) > currentVersion) {
+                    perBrowser[browserId].minVersion = String(version);
                 }
                 // Set baseline status
                 const baseline = feature.status?.baseline;
@@ -52,7 +50,7 @@ function computeRequirements(featureIds) {
                 perBrowser[browserId].blockers.push({
                     featureId,
                     bcdKey: "feature-level",
-                    version,
+                    version: String(version),
                     baseline: String(baseline) || "unknown"
                 });
             }

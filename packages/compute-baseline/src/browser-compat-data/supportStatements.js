@@ -1,7 +1,4 @@
 export class SupportStatement {
-    data;
-    browser;
-    feature;
     constructor(data, browser, feature) {
         this.data = data;
         this.browser = browser;
