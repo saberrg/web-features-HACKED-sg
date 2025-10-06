@@ -1,7 +1,11 @@
-import { defaultCompat } from "./compat.js";
-import { SupportStatement, } from "./supportStatements.js";
-import { isFeatureData } from "./typeUtils.js";
-export function feature(id, compat = defaultCompat) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Feature = void 0;
+exports.feature = feature;
+const compat_js_1 = require("./compat.js");
+const supportStatements_js_1 = require("./supportStatements.js");
+const typeUtils_js_1 = require("./typeUtils.js");
+function feature(id, compat = compat_js_1.defaultCompat) {
     let f = compat.features.get(id);
     if (f) {
         return f;
@@ -10,9 +14,9 @@ export function feature(id, compat = defaultCompat) {
     compat.features.set(id, f);
     return f;
 }
-export class Feature {
+class Feature {
     constructor(id, featureData) {
-        if (!isFeatureData(featureData)) {
+        if (!(0, typeUtils_js_1.isFeatureData)(featureData)) {
             throw new Error(`${id} is not valid feature`);
         }
         this.id = id;
@@ -70,7 +74,7 @@ export class Feature {
      * Get this feature's `SupportStatement` objects, for a given browser.
      */
     supportStatements(browser) {
-        return this.rawSupportStatements(browser).map((raw) => new SupportStatement(raw, browser, this));
+        return this.rawSupportStatements(browser).map((raw) => new supportStatements_js_1.SupportStatement(raw, browser, this));
     }
     /**
      * Find out whether this feature's support data says that a given browser
@@ -114,7 +118,7 @@ export class Feature {
         return result;
     }
     supportedBy(options) {
-        const compat = options?.compat === undefined ? defaultCompat : options.compat;
+        const compat = options?.compat === undefined ? compat_js_1.defaultCompat : options.compat;
         const browsers = options?.only
             ? options.only
             : Object.keys(this.data?.__compat?.support || {}).map((id) => compat.browser(id));
@@ -125,3 +129,4 @@ export class Feature {
         return result;
     }
 }
+exports.Feature = Feature;

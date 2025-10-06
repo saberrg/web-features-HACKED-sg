@@ -88,15 +88,15 @@ function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detect
   const lines: string[] = [];
   lines.push("");
   lines.push("Baseline Coverage Audit");
-  lines.push("Powered by Baseline Detection API");
   lines.push("");
   
   // Summary section
   lines.push("SUMMARY");
   lines.push(`Detected Features: ${detectedCount}`);
   
-  const highBaselineCount = Object.values(perBrowser).filter(b => b.baseline === "high").length;
-  lines.push(`Baseline Compliance: ${highBaselineCount}/${Object.keys(perBrowser).length} browsers have high baseline coverage`);
+  const browsersWithVersions = Object.values(perBrowser).filter(b => Number(b.minVersion) > 0);
+  const highBaselineCount = browsersWithVersions.filter(b => b.baseline === "high").length;
+  lines.push(`Baseline Compliance: ${highBaselineCount}/${browsersWithVersions.length} browsers have high baseline coverage`);
   lines.push("");
   
   // Browser requirements
@@ -130,7 +130,6 @@ function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detect
     }
   }
   
-  lines.push("This scan used the baseline detection API for accurate feature detection!");
   
   return lines.join("\n");
 }

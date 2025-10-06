@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-import * as fs from "node:fs";
-import * as path from "node:path";
-import * as process from "node:process";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("node:fs");
+const path = require("node:path");
+const process = require("node:process");
 // Import curated data and baseline computation tools
-import { features } from "../index.js";
+const index_js_1 = require("../index.js");
 // Import baseline detection API
-import { detectFeatures as detectFeaturesBaseline } from "../baseline-detector.js";
-import { identifiers as coreBrowserSet } from "../../compute-baseline/src/baseline/core-browser-set.js";
+const baseline_detector_js_1 = require("../baseline-detector.js");
+const core_browser_set_js_1 = require("../../compute-baseline/src/baseline/core-browser-set.js");
 function printHelp() {
     const help = `\nUsage: let-me-browse <srcDir>\n\nScans your source code to estimate minimum required browser versions based on detected web features.\n\nExamples:\n  let-me-browse ./src\n`;
     process.stdout.write(help);
@@ -14,7 +16,7 @@ function printHelp() {
 function computeRequirements(featureIds) {
     const perBrowser = {};
     // Initialize with core browsers
-    for (const browserId of coreBrowserSet) {
+    for (const browserId of core_browser_set_js_1.identifiers) {
         perBrowser[browserId] = {
             minVersion: "0",
             baseline: "unknown",
@@ -22,7 +24,7 @@ function computeRequirements(featureIds) {
         };
     }
     for (const featureId of featureIds) {
-        const feature = features[featureId];
+        const feature = index_js_1.features[featureId];
         if (!feature || feature.kind !== "feature")
             continue;
         // Use feature-level support for now (simpler approach)
@@ -70,13 +72,13 @@ function formatOutput(perBrowser, detectedCount, detectionResult) {
     const lines = [];
     lines.push("");
     lines.push("Baseline Coverage Audit");
-    lines.push("Powered by Baseline Detection API");
     lines.push("");
     // Summary section
     lines.push("SUMMARY");
     lines.push(`Detected Features: ${detectedCount}`);
-    const highBaselineCount = Object.values(perBrowser).filter(b => b.baseline === "high").length;
-    lines.push(`Baseline Compliance: ${highBaselineCount}/${Object.keys(perBrowser).length} browsers have high baseline coverage`);
+    const browsersWithVersions = Object.values(perBrowser).filter(b => b.minVersion > 0);
+    const highBaselineCount = browsersWithVersions.filter(b => b.baseline === "high").length;
+    lines.push(`Baseline Compliance: ${highBaselineCount}/${browsersWithVersions.length} browsers have high baseline coverage`);
     lines.push("");
     // Browser requirements
     lines.push("BROWSER REQUIREMENTS");
@@ -91,7 +93,7 @@ function formatOutput(perBrowser, detectedCount, detectionResult) {
     // Detected features
     lines.push("DETECTED FEATURES");
     for (const featureId of Array.from(detectionResult.found)) {
-        const feature = features[featureId];
+        const feature = index_js_1.features[featureId];
         if (feature) {
             const baseline = feature.status?.baseline;
             const icon = getBaselineIcon(baseline);
@@ -104,7 +106,6 @@ function formatOutput(perBrowser, detectedCount, detectionResult) {
             lines.push("");
         }
     }
-    lines.push("This scan used the baseline detection API for accurate feature detection!");
     return lines.join("\n");
 }
 function main() {
@@ -119,7 +120,7 @@ function main() {
         process.exit(1);
     }
     // Use baseline detection API
-    const detectionResult = detectFeaturesBaseline({ srcDir });
+    const detectionResult = (0, baseline_detector_js_1.detectFeatures)({ srcDir });
     if (detectionResult.found.size === 0) {
         process.stdout.write("\nNo known features detected. Try adding more detectors or point to a different directory.\n\n");
         process.exit(0);

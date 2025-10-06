@@ -1,13 +1,18 @@
 #!/usr/bin/env node
+"use strict";
 /**
  * Baseline Feature Detector
  *
  * Uses the actual detection_patterns from baseline feature YAML files
  * instead of hardcoded patterns.
  */
-import * as fs from "node:fs";
-import * as path from "node:path";
-import { readFileSync } from "node:fs";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.detectFeatures = detectFeatures;
+exports.default = detectFeatures;
+exports.formatDetectionResults = formatDetectionResults;
+const fs = require("node:fs");
+const path = require("node:path");
+const node_fs_1 = require("node:fs");
 // Simple YAML parser for basic key-value extraction
 function parseYamlSimple(content) {
     const result = {};
@@ -54,7 +59,7 @@ function parseYamlSimple(content) {
     }
     return result;
 }
-import { features } from "./index.js";
+const index_js_1 = require("./index.js");
 // File type mapping
 function getFileType(filePath) {
     const ext = path.extname(filePath).toLowerCase();
@@ -106,7 +111,7 @@ function buildDetectionPatterns() {
             const featureId = path.basename(file, '.yml');
             const filePath = path.join(featuresDir, file);
             try {
-                const yamlContent = readFileSync(filePath, 'utf8');
+                const yamlContent = (0, node_fs_1.readFileSync)(filePath, 'utf8');
                 const yamlData = parseYamlSimple(yamlContent);
                 if (!yamlData.detection_patterns)
                     continue;
@@ -139,7 +144,7 @@ function buildDetectionPatterns() {
     catch (error) {
         // Fallback to built features data if YAML reading fails
         console.warn('Could not read YAML files, falling back to built features data');
-        for (const [featureId, feature] of Object.entries(features)) {
+        for (const [featureId, feature] of Object.entries(index_js_1.features)) {
             if (!feature || feature.kind !== "feature")
                 continue;
             const detectionPatterns = feature.detection_patterns;
@@ -168,7 +173,7 @@ function buildDetectionPatterns() {
     return patterns;
 }
 // Main detection function
-export function detectFeatures(options = { srcDir: '' }) {
+function detectFeatures(options = { srcDir: '' }) {
     const { srcDir, fileTypes = [], features = [] } = options;
     const found = new Set();
     const details = new Map();
@@ -232,7 +237,7 @@ export function detectFeatures(options = { srcDir: '' }) {
     };
 }
 // Utility function for CLI tools
-export function formatDetectionResults(result) {
+function formatDetectionResults(result) {
     const lines = [];
     lines.push(`🎯 Baseline Feature Detection`);
     lines.push(`Files scanned: ${result.summary.totalFiles}`);
@@ -241,7 +246,7 @@ export function formatDetectionResults(result) {
     if (result.found.size > 0) {
         lines.push('🔍 Detected Features:');
         for (const featureId of Array.from(result.found)) {
-            const feature = features[featureId];
+            const feature = index_js_1.features[featureId];
             if (feature) {
                 const baseline = feature.status?.baseline;
                 const baselineIcon = baseline === 'high' ? '🟢' : baseline === 'low' ? '🟡' : '🔴';
@@ -255,5 +260,3 @@ export function formatDetectionResults(result) {
     }
     return lines.join('\n');
 }
-// Export the main detection function as default
-export { detectFeatures as default };

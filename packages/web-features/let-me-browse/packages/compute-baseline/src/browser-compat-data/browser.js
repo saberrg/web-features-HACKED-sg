@@ -1,7 +1,11 @@
-import { compareVersions } from "compare-versions";
-import { defaultCompat } from "./compat.js";
-import { Release } from "./release.js";
-export function browser(id, compat = defaultCompat) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Browser = void 0;
+exports.browser = browser;
+const compare_versions_1 = require("compare-versions");
+const compat_js_1 = require("./compat.js");
+const release_js_1 = require("./release.js");
+function browser(id, compat = compat_js_1.defaultCompat) {
     let b = compat.browsers.get(id);
     if (b) {
         return b;
@@ -11,18 +15,18 @@ export function browser(id, compat = defaultCompat) {
     compat.browsers.set(id, b);
     return b;
 }
-export class Browser {
+class Browser {
     constructor(id, data) {
         this.id = id;
         this.data = data;
-        const sortedReleaseData = Object.entries(data.releases).sort(([a], [b]) => compareVersions(a, b));
-        const releases = sortedReleaseData.map(([version, data], index) => new Release(this, version, data, index));
+        const sortedReleaseData = Object.entries(data.releases).sort(([a], [b]) => (0, compare_versions_1.compareVersions)(a, b));
+        const releases = sortedReleaseData.map(([version, data], index) => new release_js_1.Release(this, version, data, index));
         if (this.data.preview_name) {
             releases.push(
             // For Safari TP, "nightly" isn't literally correct, but according to
             // the BCD schema this can be any "current alpha / experimental
             // release".
-            new Release(this, "preview", { status: "nightly" }, releases.length));
+            new release_js_1.Release(this, "preview", { status: "nightly" }, releases.length));
         }
         this.releases = releases;
     }
@@ -47,3 +51,4 @@ export class Browser {
         return result;
     }
 }
+exports.Browser = Browser;

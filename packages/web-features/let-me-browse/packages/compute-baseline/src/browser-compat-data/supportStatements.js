@@ -1,4 +1,7 @@
-export class SupportStatement {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SupportStatement = void 0;
+class SupportStatement {
     constructor(data, browser, feature) {
         this.data = data;
         this.browser = browser;
@@ -128,6 +131,7 @@ export class SupportStatement {
         }));
     }
 }
+exports.SupportStatement = SupportStatement;
 function statementToQualifications(statement) {
     let qualifications = {};
     if (statement.data.prefix) {

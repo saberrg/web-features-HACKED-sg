@@ -1,4 +1,13 @@
-export function isIndexable(o) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isIndexable = isIndexable;
+exports.isCompatData = isCompatData;
+exports.isFeatureData = isFeatureData;
+exports.isBrowsers = isBrowsers;
+exports.isBrowserStatement = isBrowserStatement;
+exports.isCompatStatement = isCompatStatement;
+exports.isMetaBlock = isMetaBlock;
+function isIndexable(o) {
     if (typeof o === "object" && o !== null) {
         return true;
     }
@@ -8,7 +17,7 @@ function hasKeys(o, expectedKeys) {
     return (isIndexable(o) && Object.keys(o).every((key) => expectedKeys.includes(key)));
 }
 // The root BCD object
-export function isCompatData(o) {
+function isCompatData(o) {
     return (isIndexable(o) &&
         hasKeys(o, [
             "__meta",
@@ -25,22 +34,22 @@ export function isCompatData(o) {
             "webextensions",
         ]));
 }
-export function isFeatureData(o) {
+function isFeatureData(o) {
     return isIndexable(o) && !isBrowsers(o);
 }
-export function isBrowsers(o) {
+function isBrowsers(o) {
     return (isIndexable(o) &&
         Object.keys(o).includes("chrome") &&
         Object.keys(o).includes("edge") &&
         Object.keys(o).includes("firefox") &&
         Object.keys(o).includes("safari"));
 }
-export function isBrowserStatement(o) {
+function isBrowserStatement(o) {
     return hasKeys(o, ["name", "type", "releases"]);
 }
-export function isCompatStatement(o) {
+function isCompatStatement(o) {
     return hasKeys(o, ["support"]);
 }
-export function isMetaBlock(o) {
+function isMetaBlock(o) {
     return hasKeys(o, ["version", "timestamp"]);
 }

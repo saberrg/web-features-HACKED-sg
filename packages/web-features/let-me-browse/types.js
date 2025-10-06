@@ -1,8 +1,10 @@
+"use strict";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // Quicktype produces definitions that are correct, but not as narrow or
 // well-named as hand-written type definition might produce. This module takes
 // the Quicktype-generated types as renames or modifies the types to be somewhat
 // nicer to work with in TypeScript.
+Object.defineProperty(exports, "__esModule", { value: true });
 // These are "tests" for our type definitions.
 const badQuicktypeStatusHeadline = {
     baseline: true, // This is an improper value in our actual published data
@@ -62,4 +64,3 @@ const badFeatureSplitData = {
     // @ts-expect-error
     redirect_target: "",
 };
-export {};

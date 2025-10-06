@@ -1,5 +1,11 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-const jsonPath = fileURLToPath(new URL("./data.json", import.meta.url));
-const { browsers, features, groups, snapshots } = JSON.parse(readFileSync(jsonPath, { encoding: "utf-8" }));
-export { browsers, features, groups, snapshots };
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.snapshots = exports.groups = exports.features = exports.browsers = void 0;
+const node_fs_1 = require("node:fs");
+const node_url_1 = require("node:url");
+const jsonPath = (0, node_url_1.fileURLToPath)(new URL("./data.json", import.meta.url));
+const { browsers, features, groups, snapshots } = JSON.parse((0, node_fs_1.readFileSync)(jsonPath, { encoding: "utf-8" }));
+exports.browsers = browsers;
+exports.features = features;
+exports.groups = groups;
+exports.snapshots = snapshots;

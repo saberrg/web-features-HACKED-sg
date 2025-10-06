@@ -1,5 +1,8 @@
-import { Temporal } from "@js-temporal/polyfill";
-export class Release {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Release = void 0;
+const polyfill_1 = require("@js-temporal/polyfill");
+class Release {
     constructor(browser, version, data, index) {
         this.browser = browser;
         this.version = version;
@@ -14,7 +17,7 @@ export class Release {
         if (release_date === undefined) {
             return null;
         }
-        return Temporal.PlainDate.from(release_date);
+        return polyfill_1.Temporal.PlainDate.from(release_date);
     }
     compare(otherRelease) {
         if (otherRelease.browser !== this.browser) {
@@ -41,3 +44,4 @@ export class Release {
         return false;
     }
 }
+exports.Release = Release;

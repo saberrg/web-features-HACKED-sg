@@ -1,6 +1,9 @@
-import { isBrowserStatement, isCompatData, isCompatStatement, isFeatureData, isMetaBlock, } from "./typeUtils.js";
-export function descendantKeys(data, path) {
-    if (isCompatData(data)) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.descendantKeys = descendantKeys;
+const typeUtils_js_1 = require("./typeUtils.js");
+function descendantKeys(data, path) {
+    if ((0, typeUtils_js_1.isCompatData)(data)) {
         return [
             "api",
             "css",
@@ -14,16 +17,16 @@ export function descendantKeys(data, path) {
             "webextensions",
         ];
     }
-    if (isMetaBlock(data)) {
+    if ((0, typeUtils_js_1.isMetaBlock)(data)) {
         return [];
     }
-    if (isCompatStatement(data)) {
+    if ((0, typeUtils_js_1.isCompatStatement)(data)) {
         return [];
     }
-    if (isBrowserStatement(data)) {
+    if ((0, typeUtils_js_1.isBrowserStatement)(data)) {
         return [];
     }
-    if (isFeatureData(data)) {
+    if ((0, typeUtils_js_1.isFeatureData)(data)) {
         return Object.keys(data).filter((key) => key !== "__compat");
     }
     throw new Error(`Unhandled traverse into descendants of object at ${path ?? "[root]"}`);

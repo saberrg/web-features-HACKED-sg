@@ -12,7 +12,7 @@ interface Logger {
 }
 export declare let logger: Logger | undefined;
 export declare function setLogger(logFacility: Logger | undefined): void;
-export declare const BASELINE_LOW_TO_HIGH_DURATION: any;
+export declare const BASELINE_LOW_TO_HIGH_DURATION: Temporal.Duration;
 type BaselineStatus = "low" | "high" | false;
 type BaselineDate = string | null;
 interface SupportDetails {

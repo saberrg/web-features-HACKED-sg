@@ -1,8 +1,11 @@
-import bcd from "@mdn/browser-compat-data" with { type: "json" };
-import { browser, feature, query, walk } from "./index.js";
-import { isIndexable, isMetaBlock } from "./typeUtils.js";
-export class Compat {
-    constructor(data = bcd) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.defaultCompat = exports.Compat = void 0;
+const browser_compat_data_1 = require("@mdn/browser-compat-data");
+const index_js_1 = require("./index.js");
+const typeUtils_js_1 = require("./typeUtils.js");
+class Compat {
+    constructor(data = browser_compat_data_1.default) {
         this.data = data;
         this.browsers = new Map();
         this.features = new Map();
@@ -12,19 +15,19 @@ export class Compat {
      * `"unknown"` if unset).
      */
     get version() {
-        if (isIndexable(this.data) && isMetaBlock(this.data.__meta)) {
+        if ((0, typeUtils_js_1.isIndexable)(this.data) && (0, typeUtils_js_1.isMetaBlock)(this.data.__meta)) {
             return this.data.__meta.version;
         }
         return "unknown";
     }
     query(path) {
-        return query(path, this.data);
+        return (0, index_js_1.query)(path, this.data);
     }
     browser(id) {
-        return browser(id, this);
+        return (0, index_js_1.browser)(id, this);
     }
     feature(id) {
-        return feature(id, this);
+        return (0, index_js_1.feature)(id, this);
     }
     /**
      * Generate `Feature` objects by walking tree of features.
@@ -37,9 +40,10 @@ export class Compat {
         if (!entryPoints) {
             entryPoints = Object.keys(this.data).filter((key) => !["__meta", "browsers"].includes(key));
         }
-        for (const { path } of walk(entryPoints, this.data)) {
+        for (const { path } of (0, index_js_1.walk)(entryPoints, this.data)) {
             yield this.feature(path);
         }
     }
 }
-export const defaultCompat = new Compat(bcd);
+exports.Compat = Compat;
+exports.defaultCompat = new Compat(browser_compat_data_1.default);

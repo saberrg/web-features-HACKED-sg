@@ -124,7 +124,6 @@ function main(): void {
   // Output results
   const lines: string[] = [];
   lines.push("\nPolicy Compliance Report");
-  lines.push("Powered by Baseline Detection API");
   lines.push("");
   lines.push("SUMMARY");
   lines.push(`Total Features: ${used.size}`);
@@ -160,7 +159,6 @@ function main(): void {
     lines.push(`• Preference: ${prefer === "widely" ? "prioritizing widely available alternatives" : "prioritizing newly available alternatives"}`);
   }
   lines.push("");
-  lines.push("This scan used the baseline detection API for accurate feature detection!");
   
   process.stdout.write(lines.join("\n"));
 }

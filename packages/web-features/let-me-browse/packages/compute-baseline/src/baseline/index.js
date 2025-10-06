@@ -1,21 +1,30 @@
-import { Temporal } from "@js-temporal/polyfill";
-import { defaultCompat } from "../browser-compat-data/compat.js";
-import { feature } from "../browser-compat-data/feature.js";
-import { browsers } from "./core-browser-set.js";
-import { parseRangedDateString, toHighDate, toRangedDateString, } from "./date-utils.js";
-import { compareInitialSupport, support, } from "./support.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BASELINE_LOW_TO_HIGH_DURATION = exports.logger = exports.parseRangedDateString = exports.coreBrowserSet = void 0;
+exports.setLogger = setLogger;
+exports.getStatus = getStatus;
+exports.computeBaseline = computeBaseline;
+exports.keystoneDateToStatus = keystoneDateToStatus;
+const polyfill_1 = require("@js-temporal/polyfill");
+const compat_js_1 = require("../browser-compat-data/compat.js");
+const feature_js_1 = require("../browser-compat-data/feature.js");
+const core_browser_set_js_1 = require("./core-browser-set.js");
+const date_utils_js_1 = require("./date-utils.js");
+const support_js_1 = require("./support.js");
 // Include this in the public API
-export { identifiers as coreBrowserSet } from "./core-browser-set.js";
-export { parseRangedDateString } from "./date-utils.js";
-export let logger = process.env["DEBUG_COMPUTE_BASELINE"]
+var core_browser_set_js_2 = require("./core-browser-set.js");
+Object.defineProperty(exports, "coreBrowserSet", { enumerable: true, get: function () { return core_browser_set_js_2.identifiers; } });
+var date_utils_js_2 = require("./date-utils.js");
+Object.defineProperty(exports, "parseRangedDateString", { enumerable: true, get: function () { return date_utils_js_2.parseRangedDateString; } });
+exports.logger = process.env["DEBUG_COMPUTE_BASELINE"]
     ? console
     : undefined;
-export function setLogger(logFacility) {
-    logger = logFacility;
+function setLogger(logFacility) {
+    exports.logger = logFacility;
 }
 // Number of months after Baseline low that Baseline high happens. Keep in sync with definition:
 // https://github.com/web-platform-dx/web-features/blob/main/docs/baseline.md#wider-support-high-status
-export const BASELINE_LOW_TO_HIGH_DURATION = Temporal.Duration.from({
+exports.BASELINE_LOW_TO_HIGH_DURATION = polyfill_1.Temporal.Duration.from({
     months: 30,
 });
 /**
@@ -30,7 +39,7 @@ export const BASELINE_LOW_TO_HIGH_DURATION = Temporal.Duration.from({
  * feature overall. Then you'd call `getStatus('example-feature',
  * 'api.ExampleManager.doExample')`.
  */
-export function getStatus(featureId, compatKey, compat = defaultCompat) {
+function getStatus(featureId, compatKey, compat = compat_js_1.defaultCompat) {
     // TODO: actually check that featureId is a valid feature
     // TODO: actually check that compatKey is tagged as featureId in BCD _or_ listed in web-features
     return JSON.parse(computeBaseline({ compatKeys: [compatKey], checkAncestors: true }, compat).toJSON());
@@ -39,12 +48,12 @@ export function getStatus(featureId, compatKey, compat = defaultCompat) {
  * Given a set of compat keys, compute the aggregate Baseline support ("high",
  * "low" or false, dates, and releases) for those keys.
  */
-export function computeBaseline(featureSelector, compat = defaultCompat) {
+function computeBaseline(featureSelector, compat = compat_js_1.defaultCompat) {
     // A cutoff date approximating "now" is needed to determine when a feature has
     // entered Baseline high. We use BCD's __meta.timestamp for this, but any
     // "clock" based on the state of the tree that ticks frequently would work.
     const timestamp = compat.data.__meta.timestamp;
-    const cutoffDate = Temporal.Instant.from(timestamp)
+    const cutoffDate = polyfill_1.Temporal.Instant.from(timestamp)
         .toZonedDateTimeISO("UTC")
         .toPlainDate();
     const { compatKeys } = featureSelector;
@@ -72,10 +81,10 @@ export function computeBaseline(featureSelector, compat = defaultCompat) {
  * for a single compat key.
  */
 function calculate(compatKey, compat) {
-    const f = feature(compatKey);
+    const f = (0, feature_js_1.feature)(compatKey);
     return {
         discouraged: f.deprecated ?? false,
-        support: support(f, browsers(compat)),
+        support: (0, support_js_1.support)(f, (0, core_browser_set_js_1.browsers)(compat)),
     };
 }
 /**
@@ -115,7 +124,7 @@ function collateSupport(supports) {
         }
         else {
             support.set(browser, initialSupports
-                .sort(compareInitialSupport)
+                .sort(support_js_1.compareInitialSupport)
                 .at(-1));
         }
     }
@@ -125,7 +134,7 @@ function collateSupport(supports) {
  * Given several dates, find the most-recent date and determine the
  * corresponding Baseline status and high and low dates.
  */
-export function keystoneDateToStatus(dateSpec, cutoffDate, discouraged) {
+function keystoneDateToStatus(dateSpec, cutoffDate, discouraged) {
     if (dateSpec == null || discouraged) {
         return {
             baseline: false,
@@ -133,14 +142,14 @@ export function keystoneDateToStatus(dateSpec, cutoffDate, discouraged) {
             baseline_high_date: null,
         };
     }
-    const [date, ranged] = parseRangedDateString(dateSpec);
+    const [date, ranged] = (0, date_utils_js_1.parseRangedDateString)(dateSpec);
     let baseline = "low";
-    let baseline_low_date = toRangedDateString(date, ranged);
+    let baseline_low_date = (0, date_utils_js_1.toRangedDateString)(date, ranged);
     let baseline_high_date = null;
-    const possibleHighDate = toHighDate(date);
-    if (Temporal.PlainDate.compare(possibleHighDate, cutoffDate) <= 0) {
+    const possibleHighDate = (0, date_utils_js_1.toHighDate)(date);
+    if (polyfill_1.Temporal.PlainDate.compare(possibleHighDate, cutoffDate) <= 0) {
         baseline = "high";
-        baseline_high_date = toRangedDateString(possibleHighDate, ranged);
+        baseline_high_date = (0, date_utils_js_1.toRangedDateString)(possibleHighDate, ranged);
     }
     return { baseline, baseline_low_date, baseline_high_date };
 }
@@ -159,7 +168,7 @@ function findKeystoneDate(support) {
     }
     const keystone = initialSupports
         .sort((i1, i2) => {
-        if (Temporal.PlainDate.compare(i1.release.date, i2.release.date) === 0) {
+        if (polyfill_1.Temporal.PlainDate.compare(i1.release.date, i2.release.date) === 0) {
             if (i1.ranged && !i2.ranged) {
                 return -1;
             }
@@ -168,7 +177,7 @@ function findKeystoneDate(support) {
             }
             return 0;
         }
-        return Temporal.PlainDate.compare(i1.release.date, i2.release.date);
+        return polyfill_1.Temporal.PlainDate.compare(i1.release.date, i2.release.date);
     })
         .at(-1);
     if (!keystone.release.date) {

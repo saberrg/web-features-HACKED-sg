@@ -89,10 +89,10 @@ function checkTargets(usedFeatures, targets) {
 }
 function getBaselineIcon(baseline) {
     switch (baseline) {
-        case "high": return "🟢";
-        case "low": return "🟡";
-        case "false": return "🔴";
-        default: return "❓";
+        case "high": return "[HIGH]";
+        case "low": return "[LOW]";
+        case "false": return "[LIMITED]";
+        default: return "[UNKNOWN]";
     }
 }
 function formatOutput(problems) {
@@ -100,7 +100,7 @@ function formatOutput(problems) {
         return "\n All targets satisfied by detected features!!! :) \n\n";
     }
     const lines = [];
-    lines.push("\n Browser Target Compatibility Issues...");
+    lines.push("\nBrowser Target Compatibility Issues...");
     lines.push("");
     for (const problem of problems) {
         const browserName = problem.browser.charAt(0).toUpperCase() + problem.browser.slice(1);
