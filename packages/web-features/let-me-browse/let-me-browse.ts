@@ -5,8 +5,11 @@ import * as process from "node:process";
 
 // Import curated data and baseline computation tools
 import { browsers, features } from "../index.js";
-// Import unified detection API
-import { detectFeatures as detectFeaturesUnified } from "../detection-api.js";
+// Import baseline detection API
+import { detectFeatures as detectFeaturesBaseline } from "../baseline-detector.js";
+// Import compute-baseline utilities
+import { getStatus } from "../../compute-baseline/src/baseline/index.js";
+import { identifiers as coreBrowserSet } from "../../compute-baseline/src/baseline/core-browser-set.js";
 // Note: compute-baseline import will be available after build
 // import { computeBaseline } from "compute-baseline";
 
@@ -18,14 +21,14 @@ function printHelp(): void {
 }
 
 function computeRequirements(featureIds: string[]) {
-  const browserIds = Object.keys(browsers) as BrowserId[];
   const perBrowser: Record<string, {
     minVersion: string;
     baseline: string;
-    blockers: Array<{ featureId: string; version: string; baseline: string }>;
+    blockers: Array<{ featureId: string; bcdKey: string; version: string; baseline: string }>;
   }> = {};
   
-  for (const browserId of browserIds) {
+  // Initialize with core browsers
+  for (const browserId of coreBrowserSet) {
     perBrowser[browserId] = {
       minVersion: "0",
       baseline: "unknown",
@@ -37,33 +40,35 @@ function computeRequirements(featureIds: string[]) {
     const feature = features[featureId];
     if (!feature || feature.kind !== "feature") continue;
     
-    const support = feature.status?.support;
-    if (!support) continue;
-    
-    for (const [browserId, version] of Object.entries(support)) {
-      if (!perBrowser[browserId]) continue;
-      
-      const currentVersion = perBrowser[browserId].minVersion;
-      if (version > currentVersion) {
-        perBrowser[browserId].minVersion = version;
+    // Use feature-level support for now (simpler approach)
+    const support = (feature as any).status?.support;
+    if (support) {
+      for (const [browserId, version] of Object.entries(support)) {
+        if (!perBrowser[browserId]) continue;
+        
+        const currentVersion = perBrowser[browserId].minVersion;
+        if (String(version) > currentVersion) {
+          perBrowser[browserId].minVersion = String(version);
+        }
+        
+        // Set baseline status
+        const baseline = (feature as any).status?.baseline;
+        if (baseline === "high") {
+          perBrowser[browserId].baseline = "high";
+        } else if (baseline === "low" && perBrowser[browserId].baseline !== "high") {
+          perBrowser[browserId].baseline = "low";
+        } else if (baseline === false && perBrowser[browserId].baseline === "unknown") {
+          perBrowser[browserId].baseline = "false";
+        }
+        
+        // Add to blockers for reporting
+        perBrowser[browserId].blockers.push({
+          featureId,
+          bcdKey: "feature-level",
+          version: String(version),
+          baseline: String(baseline) || "unknown"
+        });
       }
-      
-      // Set baseline status
-      const baseline = (feature as any).status?.baseline;
-      if (baseline === "high") {
-        perBrowser[browserId].baseline = "high";
-      } else if (baseline === "low" && perBrowser[browserId].baseline !== "high") {
-        perBrowser[browserId].baseline = "low";
-      } else if (baseline === false && perBrowser[browserId].baseline === "unknown") {
-        perBrowser[browserId].baseline = "false";
-      }
-      
-      // Add to blockers for reporting
-      perBrowser[browserId].blockers.push({
-        featureId,
-        version,
-        baseline: (baseline as string) || "unknown"
-      });
     }
   }
   
@@ -83,7 +88,7 @@ function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detect
   const lines: string[] = [];
   lines.push("");
   lines.push("🎯 Baseline Coverage Audit");
-  lines.push("✨ Powered by Unified Detection API");
+  lines.push("✨ Powered by Baseline Detection API");
   lines.push("");
   
   // Summary section
@@ -125,7 +130,7 @@ function formatOutput(perBrowser: ReturnType<typeof computeRequirements>, detect
     }
   }
   
-  lines.push("🚀 This scan used the unified detection API for accurate feature detection!");
+  lines.push("🚀 This scan used the baseline detection API for accurate feature detection!");
   
   return lines.join("\n");
 }
@@ -143,8 +148,8 @@ function main(): void {
     process.exit(1);
   }
 
-  // Use unified detection API
-  const detectionResult = detectFeaturesUnified({ srcDir });
+  // Use baseline detection API
+  const detectionResult = detectFeaturesBaseline({ srcDir });
   if (detectionResult.found.size === 0) {
     process.stdout.write("\nNo known features detected. Try adding more detectors or point to a different directory.\n\n");
     process.exit(0);

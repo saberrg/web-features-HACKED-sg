@@ -4,8 +4,11 @@ import * as path from "node:path";
 import * as process from "node:process";
 
 import { features, groups, snapshots } from "../index.js";
-// Import unified detection API
-import { detectFeatures as detectFeaturesUnified } from "../detection-api.js";
+// Import baseline detection API
+import { detectFeatures as detectFeaturesBaseline } from "../baseline-detector.js";
+// Import compute-baseline utilities
+import { getStatus } from "../../compute-baseline/src/baseline/index.js";
+import { identifiers as coreBrowserSet } from "../../compute-baseline/src/baseline/core-browser-set.js";
 // Note: compute-baseline import will be available after build
 // import { computeBaseline } from "compute-baseline";
 
@@ -96,8 +99,8 @@ function main(): void {
     process.exit(2);
   }
   
-  // Use unified detection API
-  const detectionResult = detectFeaturesUnified({ srcDir });
+  // Use baseline detection API
+  const detectionResult = detectFeaturesBaseline({ srcDir });
   const used = detectionResult.found;
   const nonCompliant = new Set<string>();
   const compliant = new Set<string>();
@@ -106,6 +109,7 @@ function main(): void {
     const feature = features[featureId];
     if (!feature || feature.kind !== "feature") continue;
     
+    // Check feature-level compliance (simpler approach)
     const isCompliant = mode === "allow" ? 
       specs.some(spec => (feature as any).spec?.some((s: string) => s.includes(spec))) :
       !specs.some(spec => (feature as any).spec?.some((s: string) => s.includes(spec)));
@@ -120,7 +124,7 @@ function main(): void {
   // Output results
   const lines: string[] = [];
   lines.push("\n🎯 Policy Compliance Report");
-  lines.push("✨ Powered by Unified Detection API");
+  lines.push("✨ Powered by Baseline Detection API");
   lines.push("");
   lines.push("📊 SUMMARY");
   lines.push(`Total Features: ${used.size}`);
@@ -156,7 +160,7 @@ function main(): void {
     lines.push(`• Preference: ${prefer === "widely" ? "prioritizing widely available alternatives" : "prioritizing newly available alternatives"}`);
   }
   lines.push("");
-  lines.push("🚀 This scan used the unified detection API for accurate feature detection!");
+  lines.push("🚀 This scan used the baseline detection API for accurate feature detection!");
   
   process.stdout.write(lines.join("\n"));
 }

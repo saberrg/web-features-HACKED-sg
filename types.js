@@ -1,17 +1,15 @@
-"use strict";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // Quicktype produces definitions that are correct, but not as narrow or
 // well-named as hand-written type definition might produce. This module takes
 // the Quicktype-generated types as renames or modifies the types to be somewhat
 // nicer to work with in TypeScript.
-Object.defineProperty(exports, "__esModule", { value: true });
 // These are "tests" for our type definitions.
-var badQuicktypeStatusHeadline = {
+const badQuicktypeStatusHeadline = {
     baseline: true, // This is an improper value in our actual published data
     support: {},
 };
-var badQuicktypeStatus = badQuicktypeStatusHeadline;
-var badSupportStatus = {
+const badQuicktypeStatus = badQuicktypeStatusHeadline;
+const badSupportStatus = {
     // This validates that we're actually overriding Quicktype (and correctly). If
     // `baseline: true` ever becomes possible in the `SupportStatus`, then
     // TypeScript will complain about the next line.
@@ -19,16 +17,16 @@ var badSupportStatus = {
     baseline: true,
     support: {},
 };
-var badStatus = {
+const badStatus = {
     // @ts-expect-error
     baseline: true,
     support: {},
 };
-var goodSupportStatus = {
+const goodSupportStatus = {
     baseline: false,
     support: {},
 };
-var goodFeatureData = {
+const goodFeatureData = {
     kind: "feature",
     name: "Test",
     description: "Hi",
@@ -46,21 +44,22 @@ var goodFeatureData = {
         support: {},
     },
 };
-var goodFeatureMovedData = {
+const goodFeatureMovedData = {
     kind: "moved",
     redirect_target: "",
 };
-var badFeatureMovedData = {
+const badFeatureMovedData = {
     kind: "moved",
     // @ts-expect-error
     redirect_targets: ["", ""],
 };
-var goodFeatureSplitData = {
+const goodFeatureSplitData = {
     kind: "split",
     redirect_targets: ["", ""],
 };
-var badFeatureSplitData = {
+const badFeatureSplitData = {
     kind: "split",
     // @ts-expect-error
     redirect_target: "",
 };
+export {};

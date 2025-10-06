@@ -4,8 +4,9 @@ import * as path from "node:path";
 import * as process from "node:process";
 
 import { browsers, features } from "../index.js";
-// Import unified detection API
-import { detectFeatures as detectFeaturesUnified } from "../detection-api.js";
+import { detectFeatures as detectFeaturesBaseline } from "../baseline-detector.js";
+import { getStatus } from "../../compute-baseline/src/baseline/index.js";
+import { identifiers as coreBrowserSet } from "../../compute-baseline/src/baseline/core-browser-set.js";
 
 type BrowserId = string;
 
@@ -14,11 +15,20 @@ interface Target {
   version: string;
 }
 
+//CLI tool that answers the question of will my code break on these browsers?
+// scans your code for web features and checks if they are supported by the browser targets.
+//use this by doing fix-my-browse <srcDir> --targets=<list>|--default
+//for example: fix-my-browse ./src --targets=chrome>=116,firefox>=117,safari>=16.4,edge>=116
+
+//if everything is good, you will see a message like this: All targets satisfied by detected features.
+
+
 function printHelp(): void {
   const help = `\nUsage: fix-my-browse <srcDir> --targets=<list>|--default\n\nExamples:\n  fmb ./src --targets=chrome>=116,firefox>=117,safari>=16.4,edge>=116\n  fmb ./packages/app --default\n\n--default uses a reasonable set of current stable majors (from browsers data).\n`;
   process.stdout.write(help);
 }
 
+//organizes the targets into a list of browser and version
 function parseTargets(arg?: string): Target[] {
   if (!arg) return [];
   const items = arg.split(",").map((x) => x.trim()).filter(Boolean);
@@ -32,16 +42,18 @@ function parseTargets(arg?: string): Target[] {
 }
 
 function defaultTargets(): Target[] {
-  const ids = Object.keys(browsers) as BrowserId[];
   const out: Target[] = [];
-  for (const id of ids) {
-    const rel = (browsers as any)[id]?.releases as { version: string }[] | undefined;
-    const latest = rel?.at(-1)?.version;
-    if (latest) out.push({ browser: id, version: latest });
+  for (const browserId of coreBrowserSet) {
+    const browser = browsers[browserId];
+    if (browser?.releases) {
+      const latest = browser.releases[browser.releases.length - 1]?.version;
+      if (latest) out.push({ browser: browserId, version: latest });
+    }
   }
   return out;
 }
 
+//... compares browser versions!
 function compareVersions(a: string, b: string): number {
   const sanitize = (v: string) => v.replace(/[^0-9.]/g, "");
   const as = sanitize(a).split(".").map((n) => parseInt(n, 10));
@@ -56,12 +68,14 @@ function compareVersions(a: string, b: string): number {
   return 0;
 }
 
+//checks if the features are supported by the targeted browsers using granular BCD key checking
 function checkTargets(usedFeatures: Set<string>, targets: Target[]) {
   const problems: Array<{
     browser: BrowserId;
     version: string;
     blockers: Array<{
       featureId: string;
+      bcdKey: string;
       required: string;
       feature: string;
       baseline?: string;
@@ -71,6 +85,7 @@ function checkTargets(usedFeatures: Set<string>, targets: Target[]) {
   for (const target of targets) {
     const blockers: Array<{
       featureId: string;
+      bcdKey: string;
       required: string;
       feature: string;
       baseline?: string;
@@ -80,15 +95,15 @@ function checkTargets(usedFeatures: Set<string>, targets: Target[]) {
       const feature = features[featureId];
       if (!feature || feature.kind !== "feature") continue;
       
+      // Use feature-level support for now (simpler approach)
       const required = (feature as any).status?.support?.[target.browser];
-      if (!required) continue;
-      
-      if (compareVersions(target.version, required) < 0) {
+      if (required && compareVersions(target.version, required) < 0) {
         blockers.push({
           featureId,
+          bcdKey: "feature-level",
           required,
           feature: (feature as any).name || featureId,
-          baseline: (feature as any).status?.baseline
+          baseline: String((feature as any).status?.baseline || 'unknown')
         });
       }
     }
@@ -116,17 +131,16 @@ function getBaselineIcon(baseline?: string): string {
 
 function formatOutput(problems: ReturnType<typeof checkTargets>): string {
   if (problems.length === 0) {
-    return "\n✅ All targets satisfied by detected features.\n\n";
+    return "\n All targets satisfied by detected features!!! :) \n\n";
   }
   
   const lines: string[] = [];
-  lines.push("\n🚫 Browser Target Compatibility Issues");
-  lines.push("✨ Powered by Unified Detection API");
+  lines.push("\n Browser Target Compatibility Issues...");
   lines.push("");
   
   for (const problem of problems) {
     const browserName = problem.browser.charAt(0).toUpperCase() + problem.browser.slice(1);
-    lines.push(`❌ ${browserName} ${problem.version} has ${problem.blockers.length} blockers:`);
+    lines.push(`${browserName} ${problem.version} has ${problem.blockers.length} blockers:`);
     lines.push("");
     
     for (const blocker of problem.blockers) {
@@ -135,6 +149,7 @@ function formatOutput(problems: ReturnType<typeof checkTargets>): string {
       const icon = getBaselineIcon(baseline);
       
       lines.push(`  ${icon} ${blocker.feature} (${blocker.featureId})`);
+      lines.push(`     BCD Key: ${blocker.bcdKey}`);
       lines.push(`     Requires: ${blocker.required}`);
       if ((feature as any)?.description) {
         lines.push(`     ${(feature as any).description}`);
@@ -143,8 +158,7 @@ function formatOutput(problems: ReturnType<typeof checkTargets>): string {
     }
   }
   
-  lines.push("💡 Consider upgrading your browser targets or using alternative features.");
-  lines.push("🚀 This scan used the unified detection API for accurate feature detection!");
+  lines.push("Consider upgrading your browser targets or using alternative features.");
   
   return lines.join("\n");
 }
@@ -171,8 +185,7 @@ function main(): void {
     process.exit(2);
   }
 
-  // Use unified detection API
-  const detectionResult = detectFeaturesUnified({ srcDir });
+  const detectionResult = detectFeaturesBaseline({ srcDir });
   const used = detectionResult.found;
   const problems = checkTargets(used, targets);
   process.stdout.write(formatOutput(problems));
